@@ -1,8 +1,10 @@
+#!/usr/bin/env node
+
 var fs = require('fs');
 var path = require('path');
-var startPoint = path.join(__dirname, "stories");
-
-function a(dir = startPoint) {
+var startPoint = path.join(__dirname, process.argv[3]);
+var patt = process.argv[2];
+function a(dir, patt) {
   const subDirs = fs.readdirSync(dir);
   let files = [], dirs = [];
 
@@ -18,7 +20,7 @@ function a(dir = startPoint) {
 
     for (let k = 0; k < inputArr.length; k++) {
       const filePath = path.join(dir, files[j]);
-      if (inputArr[k].includes('like')) console.log(`${filePath}:${k}\t ${inputArr[k]}`);
+      if (inputArr[k].includes(patt)) console.log(`${filePath}:${k}\t ${inputArr[k]}`);
     }
   }
 
@@ -26,9 +28,11 @@ function a(dir = startPoint) {
   if (!dirs.length) {
     return;
   } else {
-    const nextPath = path.join(dir, dirs[l]);
-    for (let l = 0; l < dirs.length; l++) a(nextPath);
+    for (let l = 0; l < dirs.length; l++) {
+      const nextPath = path.join(dir, dirs[l]);
+      a(nextPath, patt);
+    }
   }
 }
 
-a()
+a(startPoint, patt)
