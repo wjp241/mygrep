@@ -1,24 +1,33 @@
 var fs = require('fs');
 var path = require('path');
-function a(dir = path.join(__dirname, "stories")) {
-  console.log(dir)
-  const subdirs = fs.readdirSync(dir);
+var startPoint = path.join(__dirname, "stories");
+
+function a(dir = startPoint) {
+  const subDirs = fs.readdirSync(dir);
   let files = [], dirs = [];
-  for (let i = 0; i < subdirs.length; i++) {
-    if (fs.statSync(`${dir}/` + subdirs[i]).isDirectory()) dirs.push(subdirs[i]);
-    if (fs.statSync(`${dir}/` + subdirs[i]).isFile()) files.push(subdirs[i]);
+
+  for (let i = 0; i < subDirs.length; i++) {
+    const dirStat = fs.statSync(`${dir}/` + subDirs[i]);
+    if (dirStat.isDirectory()) dirs.push(subDirs[i]);
+    if (dirStat.isFile()) files.push(subDirs[i]);
   }
 
   for (let j = 0; j < files.length; j++) {
     const inputStr = fs.readFileSync(`${dir}/` + files[j], { encoding: "utf-8" }).trim();
     const inputArr = inputStr.split('\n');
+
     for (let k = 0; k < inputArr.length; k++) {
-      if (inputArr[k].includes('like')) console.log(`${path.join(__dirname, files[j])}:${k}\t ${inputArr[k]}`);
+      const filePath = path.join(dir, files[j]);
+      if (inputArr[k].includes('like')) console.log(`${filePath}:${k}\t ${inputArr[k]}`);
     }
   }
 
-  for (let l = 0; l < dirs.length; l++) {
-    a(path.join(dir, dirs[l]))
+  //base case
+  if (!dirs.length) {
+    return;
+  } else {
+    const nextPath = path.join(dir, dirs[l]);
+    for (let l = 0; l < dirs.length; l++) a(nextPath);
   }
 }
 
